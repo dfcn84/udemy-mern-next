@@ -49,7 +49,7 @@ router.post('/', async (req, res) => {
         return res.status(401).send("Password must be at least 8 characters");
 
     try {
-
+console.log(req.body.user);
         let user;
         user = await UserModel.findOne({ username: username.toLowerCase() });
         if (user)

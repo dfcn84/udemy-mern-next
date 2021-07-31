@@ -5,6 +5,9 @@ import axios from "axios";
 import FormFields from "../components/Common/FormFields";
 import ImageDragDrop from "../components/Common/ImageDragDrop";
 import { HeaderMessage, FooterMessage } from "../components/Common/WelcomeMessage";
+import { registerUser } from "../utils/authUser";
+import { uploadPhoto } from "../utils/uploadPicToCloudinary";
+
 const regexUserName = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/;
 
 const Signup = () => {
@@ -36,9 +39,24 @@ const Signup = () => {
     const [usernameLoading, setUsernameLoading] = useState(false);
     const [usernameAvailable, setUsernameAvailable] = useState(false);
 
-    const handleSubmit = (e) => {
+    let cancel;
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setFormLoading(true);
+        let profilePhotoUrl;
+        if (media !== null) {
+            profilePhotoUrl = await uploadPhoto(media);
+        }
+
+        if (media !== null && !profilePhotoUrl)  {
+            setFormLoading(false);
+            return setErrorMsg("Error uploading image.")
+        }
+
+        await registerUser(user, profilePhotoUrl, setErrorMsg, setFormLoading);
     };
+
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -56,7 +74,39 @@ const Signup = () => {
     useEffect(() => {
         const isUser = Object.values({ name, email, password, bio }).every(item => Boolean(item))
         isUser ? setSubmitDisabled(false) :  setSubmitDisabled(true);
-    });
+    }, [user]);
+
+    useEffect(() => {
+        username === "" ? setUsernameAvailable(false) : checkUsername();
+        console.log("ue username", username);
+    }, [username]);
+
+    const checkUsername = async () => {
+        setUsernameLoading(true);
+        try {
+            cancel && cancel();
+            const CancelToken = axios.CancelToken;
+
+            const res = await axios.get(`${baseUrl}/api/signup/${username}`, { cancelToken: new CancelToken(canceler => {
+                cancel = canceler;
+            }) });
+
+            if (errorMsg !== null) setErrorMsg(null);
+
+            if (res.data === "Available") {
+                setUsernameAvailable(true);
+                setUser(prev => ({
+                    ...prev,
+                    username
+                }));
+            }
+        }
+        catch (err) {
+            setErrorMsg("Username not available");
+            setUsernameAvailable(false);
+        }
+        setUsernameLoading(false);
+    }
 
     return (
         <>

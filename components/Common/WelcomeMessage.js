@@ -4,13 +4,13 @@ import Link from "next/link";
 
 export const HeaderMessage = () => {
     const router = useRouter();
-    const signupRoute = router.pathnamr === "/signup";
+    const signupRoute = router.pathname === "/signup";
 
     return (
         <Message 
             color="teal"
             attached    
-            header={ signupRoute ? "Get Statrted" : "Welcome back" }
+            header={ signupRoute ? "Get Started" : "Welcome back" }
             icon={ signupRoute ? "settings" : "privacy" }
             content= { signupRoute ? "Create new account" : "Login with email and password"}
         />
