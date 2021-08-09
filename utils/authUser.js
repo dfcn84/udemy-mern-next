@@ -46,3 +46,10 @@ export const redirectUser = async (ctx, loc) => {
         Router.push(location);
     }
 }
+
+export const logoutUser = (email) => {
+    cookie.set("userEmail", email);
+    cookie.remove("token");
+    Router.push("/login");
+    Router.reload();
+}

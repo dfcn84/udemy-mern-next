@@ -4,6 +4,7 @@ import baseUrl from "../utils/baseUrl";
 import axios from "axios";
 import { loginUser } from "../utils/authUser";
 import { HeaderMessage, FooterMessage } from "../components/Common/WelcomeMessage";
+import cookie from "js-cookie";
 
 const Login = () => {
     const [ user, setUser ] = useState({
@@ -22,6 +23,12 @@ const Login = () => {
         const isUser = Object.values({ email, password }).every(item => Boolean(item))
         isUser ? setSubmitDisabled(false) :  setSubmitDisabled(true);
     });    
+
+    useEffect(() => {
+        document.title= 'Welcome back';
+        const userEmail = cookie.get("userEmail");
+        if (userEmail) setUser(prev => ({ ...prev, email: userEmail }))
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
