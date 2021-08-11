@@ -22,7 +22,7 @@ router.post('/', authMiddleware, async (req, res) => {
 
         const post = await new PostModel(newPost).save();
 
-        return res.json(post);
+        return res.json(post._id);
 
     } catch(err) {
         console.log(err);
@@ -180,7 +180,6 @@ router.post('/comment/:postId', authMiddleware, async (req, res) => {
         if (!post) {
             return res.status(400).send('Post not found.');
         }
-console.log(uuid());
         const newComment = {
             _id: uuid(),
             text,
@@ -191,7 +190,7 @@ console.log(uuid());
         await post.comments.unshift(newComment);
         await post.save();
 
-        return res.status(200).send("Comment added");
+        return res.status(200).json(newComment._id);
 
 
     } catch(err) {
@@ -199,6 +198,49 @@ console.log(uuid());
         return res.status(500).send("Server error");
     }    
 })
+
+router.delete('/:postId/:commentId', authMiddleware, async (req, res) => {
+    try {
+
+        const { userId } = req;
+        const { postId, commentId } = req.params;
+
+        const post = await PostModel.findById(postId);
+
+        if (!post) {
+            return res.status(400).send('Post not found.');
+        }
+
+        const comment = post.comments.find(comment => comment._id === commentId );
+        if (!comment) {
+            return res.status(404).send("Comment not found");
+        }
+        const user = await UserModel.findById(userId);
+
+        const deleteComment = async () => {
+            const index = post.comments.map(comment => comment._id).indexOf(commentId);
+            await post.comments.splice(index, 1);
+            await post.save();
+            return res.status(200).send("Comment deleted successfully");
+        };
+
+        if (comment.user.toString() !== userId) {
+            if (user.role === "root") {                
+                await deleteComment();
+            }
+            else {
+                return res.status(401).send("Unauthorized");
+            }
+        }
+
+        await deleteComment();
+
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send("Server error");
+    }    
+})
+
 
 
 module.exports = router;
