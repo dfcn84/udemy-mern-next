@@ -31,7 +31,7 @@ function Layout({ children, user }) {
                 <Grid.Column width={10}>
                   <Visibility context={contextRef}>{children}</Visibility>
                 </Grid.Column>
-                <Grid.Column floated="left" width={5}>
+                <Grid.Column floated="left" width={4}>
                   <Sticky context={contextRef}>
                     <Segment basic>
                       <SearchUsers />
