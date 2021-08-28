@@ -14,6 +14,8 @@ import PostComments from "./PostComments";
 import CommentInputField from "./CommentInputField";
 import calculateTime from "../../utils/calculateTime";
 import Link from "next/link";
+import { deletePost } from "../../utils/postActions";
+
 
 const CardPost = ({ post, user, setPosts, setShowToastr }) => {
     const [ likes, setLikes ] = useState(post.likes);
@@ -53,7 +55,7 @@ const CardPost = ({ post, user, setPosts, setShowToastr }) => {
                                 }>
                                     <Header as="h4"content="Are you sure?" />
                                     <p>This cannot be undone!</p>
-                                    <Button color="red" icon="trash" content="Delete" />
+                                    <Button color="red" icon="trash" content="Delete" onClick={() => deletePost(post._id, setPosts, setShowToastr)} />
                                 </Popup>
                             </>
                         )}
@@ -86,8 +88,8 @@ const CardPost = ({ post, user, setPosts, setShowToastr }) => {
                             style={{ marginLeft: "7px" }}
                             color="blue"
                         />
-                        { comments.length > 0 && (
-                            comments.map((comment, i) => {
+                        { comments.length > 0 &&
+                            comments.map((comment, i) => 
                                 i < 3 && (
                                 <PostComments 
                                     key={comment._id}
@@ -97,8 +99,8 @@ const CardPost = ({ post, user, setPosts, setShowToastr }) => {
                                     setComments={ setComments }
                                 />
                                 )
-                            })
-                        )}
+                            )
+                        }
 
                         { comments.length > 3 && (
                             <Button content="View More" color="teal" basic circular />

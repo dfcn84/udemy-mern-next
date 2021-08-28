@@ -1,6 +1,34 @@
-const PostComments = () => {
+import { useState } from "react";
+import { Comment, Icon } from "semantic-ui-react"
+import calculateTime from "../../utils/calculateTime"
+
+const PostComments = ({ comment, user, setComments, postId }) => {
+
+    const [disabled, setDisabled] = useState(false);
+
     return (
-        <div>PostComments</div>
+        <>
+            <Comment.Group>
+                <Comment>
+                    <Comment.Avatar src={ comment.user.profilePhotoUrl } />
+                    <Comment.Content>
+                        <Comment.Author as='a' href={`/${ comment.user.username }`}>{ comment.user.name }</Comment.Author>
+                        <Comment.Metadata>
+                            { calculateTime(comment.date) }
+                        </Comment.Metadata>
+                        <Comment.Text>
+                            { comment. text }
+                        </Comment.Text>
+                        <Comment.Actions>
+                            {(user.role === "root" || comment.user._id === user._id) && (
+                                <Icon disabled={ disabled } color="red" name="trash" />
+                            )}
+                        </Comment.Actions>
+                    </Comment.Content>
+                </Comment>
+            </Comment.Group>
+
+        </>
     )
 }
 
